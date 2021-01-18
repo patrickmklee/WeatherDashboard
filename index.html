@@ -1,74 +1,80 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>Weather Dashboard</title>
     <link
     rel="stylesheet"
     href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
     />
-    </head>
   </head>
   <body>
         <header>
-        <!-- <div class="container "> -->
-            <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
-                <div class="container d-flex justify-content-between">
-                    <p class="h1 text-light">Weather Dashboard</p>
-                </div>
-            </nav>
+        <!-- <div class="container"> -->
+          <div class="navbar navbar-dark bg-dark shadow-sm">
+            <div class="container d-flex justify-content-between">
+              <a href="#" class="navbar-brand d-flex align-items-center">
+                <strong>Weather Dashboard</strong>
+              </a>
+              <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarHeader" aria-controls="navbarHeader" aria-expanded="true" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+              </button>
+            </div>
+          </div>
+            <!-- <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+              <div class="container">
+              <span class="navbar-brand h1 text-light">Weather Dashboard</span>
+              </div>
+            </nav> -->
+          <!-- </div> -->
         </header>
+        
         <div class="container">
-            <div class="row">
-            <div class="col">
-                <div class="row">
-                    <form class="form-inline my-2 my-lg-0">
-                        <input class="form-control mr-sm-2" id="search-city" type="search" placeholder="ex. City, State" aria-label="Search">
-                        <button class="btn btn-outline-success my-2 my-sm-0" type="button" onclick="searchForCity()">Search</button>
-                    </form>
+          <div class = "row">             
+          <nav id="sidebarMenu" class="col-md-4 mt-2 col-lg-3 border bg-dark d-md-block">
+             <div class="sidebar mt-2 pt-2 ">
+                  <form>
+                     <div class="form-group d-inline-flex my-2 my-lg-0"></form>
+                        <input class="form-control my-sm-0" id="city-name" type="text" placeholder="Enter a city">
+                        <button class="btn btn-outline-success my-2 my-sm-0" id="new-city-search" type="submit">Search</button>
+                     </div>
+                <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                  <span>Previous Searches</span>
+                </h6>
+                <ul id="search-history-ul" class="nav flex-column mb-2">
+                </ul>
+              </div>
+            </nav>
+            <main role="main" class="col-md-8 col-lg-9 d-md-block bg-light">
+
+              <!-- <div class="card mb-3 align-right">
+                <img src="..." class="card-img-top" alt="...">
+                <div class="card-body">
+                  <h5 class="card-title">Card title</h5>
+                  <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+                  <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
                 </div>
-                <div class="row">
-                <div class="card my-4">
-                <ul class="list-group list-group-flush">
-                    <li class="list-group-item">Cras justo odio</li>
-                    <li class="list-group-item">Dapibus ac facilisis in</li>
-                    <li class="list-group-item">Vestibulum at eros</li>
-                  </ul>
-                </div>
-                </div>
+              </div> -->
+            <div class="card my-3">
+              <!-- <img src="..." class="card-img-top" alt="..."> -->
+              <!-- <link rel="icon" rel="http://openweathermap.org/img/wn/10d@4x.png" type="image/gif" sizes="200x200"/> -->
+              <div id="current-weather-card" class="card-body">
+                <h3 class="card-title">Please select a City</h3>
+              </div>
+              <ul id="current-weather-list" class="list-group list-group-flush"></ul>
             </div>
-            <div class="col">
-                <div class="card" style="width: 24rem;">
-                    <div class="card-body">
-                      <h5 class="card-title">City Name</h5>
-                      <p class="card-text">weather and stuff</p>
-                    </div>
-                    <!-- <ul class="list-group list-group-flush"> -->
-                      <!-- <li class="list-group-item">Cras justo odio</li>
-                      <li class="list-group-item">Dapibus ac facilisis in</li>
-                      <li class="list-group-item">Vestibulum at eros</li>
-                    </ul> -->
-                    <div class="card-body">
-                      <a href="#" class="card-link">   DAY    </a>
-                      <a href="#" class="card-link">   DAY    </a>
-                      <a href="#" class="card-link">   DAY    </a>
-                      <a href="#" class="card-link">   DAY    </a>
-                      <a href="#" class="card-link">   DAY    </a>
-                    </div>
-                  </div>
-                </div>
-            </div>
+            </main>
+
+          </div>
+        </div>
         <!-- </div> -->
-    
     </div>
-    <div>
-      <button type="button" onclick="myFunction()">MyFunction</button>
-      <div id="test-response">
-        ...
-      </div>
-    </div>
-    <script src="js/script.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/momentjs/2.12.0/moment.min.js"></script>
+    <script src="./js/script.js"></script>
+
+
     
   </body>
 </html>
