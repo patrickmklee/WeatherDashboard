@@ -208,7 +208,7 @@ function getOneCall(url) {
     // searchArgs = searchText.split(',');
     console.log(`Searching for ${searchText}`)
     // responseEl.innerHTML="";
-    fetch(`http://api.openweathermap.org/geo/1.0/direct?q=${searchText}&limit=1&appid=${openweather_api_key}`)
+    fetch(`https://api.openweathermap.org/geo/1.0/direct?q=${searchText}&limit=1&appid=${openweather_api_key}`)
     .then(function(response) {
       return response.json();
     })
