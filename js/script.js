@@ -10,7 +10,7 @@ const openweather_api_key = config.OWEATHER_KEY;
 const weather_exclude = "minutely,hourly"
 const unit_standard = "imperial";
 const targetJSONParams = {'current': ['temp','humidity','wind_speed','uvi'],
-                          '5D':['temp','humidity'] }
+                          'daily':['icon', 'temp','humidity'] }
 const UV_INDEX_LIMIT_LOW = 2;
 const UV_INDEX_LIMIT_MID = 5;
 const UV_INDEX_LIMIT_HIGH = 6;
@@ -26,6 +26,13 @@ function createForecast(dailyForecastData) {
       genDayElement(dailyForecastData[i]);
   }
 } 
+var createWeatherObj = function(weatherResponseData) {
+  for (const key of targetJSONParams['daily']) {
+    const value = weatherResponseData.key;
+
+  }
+  
+};
 function renderDashboard(weatherDataObj) {
   for (const [key, value] of Object.entries(weatherDataObj)) {
     console.log(`${key}: ${value}`);
@@ -108,6 +115,7 @@ function getOneCall(url) {
         'weatherType' : weatherType,
         'weatherIcon' : weatherIcon
       };
+      console.log(response.daily);
       createForecast(response.daily);
       // searchItemButton.id = name;
       // searchItemButton.value= city_id
