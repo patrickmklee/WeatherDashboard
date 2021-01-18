@@ -18,7 +18,7 @@ function getDailyForecast(dailyForecastData) {
   // temperature
   // humidity
   for (var i=0; i < 5; i++){
-    
+
   }
 } 
 function renderDashboard(weatherDataObj) {
@@ -33,7 +33,7 @@ function renderDashboard(weatherDataObj) {
   // imgEl.className = "card-img";
   // imgEl.src = `htctp://openweathermap.org/img/wn/${icon}@4x.png`;
   // weatherIconImgEl.append(imgEl);
-  weatherIconImgEl.innerHTML = `<figure class=figure> <img src=${icon_url} class="figure-img" height="200" width="200" </img>`;
+  weatherIconImgEl.innerHTML = `<figure class=figure> <img src=${icon_url} class="figure-img" height="100" width="100" </img>`;
   
   // weatherIconImgEl.innerHTML
   // weatherDataObj.forEach( function(item) {
@@ -154,16 +154,21 @@ function getOneCall(url) {
   //   searchHistoryEl.appendChild(searchItemButton);
     
   // }
-  function renderSearchHistory(search_history) {
-    // $('#search-history-div').empty();
-    for (const [key, value] of Object.entries(search_history)) {
-      console.log(`${key}: ${value}`);
+  function renderSearchHistory() {
+    $('#search-history-div').empty();
+    for (var i=0; i < search_history.length; i++) {
+    // for (const [key, value] of Object.entries(search_history)) {
+      let key = search_history[i];
+      console.log(`${key}`);
+      
+      var mySearchArray = localStorage.getItem(key);
+      console.log(mySearchArray);
       var searchItemButton = document.createElement("button");
-      
-      searchItemButton.addClass("list-group-item list-group-item-action");
-      searchItemButton.value(search_history[i])
-      
-      var search_term = search_history[i].searchText;
+      searchItemButton.value=mySearchArray.query;
+      searchItemButton.name=mySearchArray.name;
+      searchItemButton.textContent=fullName;
+      searchItemButton.classList = "list-group-item list-group-item-action";
+      searchHistoryEl.appendChild(searchItemButton);
     }
     // for (var i=0; i<search_history.length; i++){
       // console.log(search_history[i]);
@@ -191,7 +196,7 @@ function getOneCall(url) {
 
     // Adds the button to the `toDoItem`
     // toDoItem = toDoItem.prepend(toDoClose);
-    searchItem = searchItem.append(searchItemButton);
+    // searchItem = searchItem.append(searchItemButton);
 
     // Adds 'toDoItem' to the To-Do List div
     // $('#search-history-ul').append(searchItem);   
@@ -225,21 +230,26 @@ function getOneCall(url) {
 
     // renderTodos(list);
     // appendSearchInst(searchText);
-    // renderSearchHistory(search_history);
+    
 
     // // Save the to-dos into localStorage
     // // We need to use JSON.stringify to turn the list from an array into a string
     if (country === "US") {
-      var fullName = `${name}, ${state}, ${country}`;
-    } else {
       var fullName = `${name}, ${state}`;
+    } else {
+      var fullName = `${name}, ${country}`;
     }
     var query = `lat=${lat}&lon=${lon}&${weather_exclude}&units=${unit_standard}`;
-    var searchHistoryItem = {searchText : [fullName,query]}
+    var searchHistoryItem = {"fullName": fullName,
+                            "query":query
+                          }
+
     search_history.push(searchText);
     localStorage.setItem(searchText, JSON.stringify(searchHistoryItem));
     var searchItemButton = document.createElement("button");
-    searchItemButton.value=`lat=${lat}&lon=${lon}`;
+    searchItemButton.value=query;
+    searchItemButton.name=name;
+    // searchItemButton.id=``
     searchItemButton.textContent=name;
     searchItemButton.classList = "list-group-item list-group-item-action";
     searchHistoryEl.appendChild(searchItemButton);
@@ -267,6 +277,7 @@ function getOneCall(url) {
   var formSubmitHandler = function(event) {
     event.preventDefault();
     console.log(event.target);
-
+    // debugger;
   }
+  renderSearchHistory();
   searchFormEl.addEventListener("submit",formSubmitHandler);
