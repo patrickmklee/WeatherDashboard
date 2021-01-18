@@ -2,25 +2,38 @@
 //`https://api.openweathermap.org/data/2.5/onecall?lat={lat}&lon={lon}&exclude={part}&appid={API key}`
 //`api.openweathermap.org/data/2.5/forecast?q={city name},{state code},{country code}&appid={API key}`
 //`http://api.openweathermap.org/geo/1.0/direct?q={city name},{state code},{country code}&limit={limit}&appid={API key}`
+var searchFormEl = document.querySelector("#search-form");
 var responseEl = document.querySelector("#current-weather-card");
-const responseHeaderEl = document.getElementById("current-city");
-const openweather_api_key = "5fc3f110a3d5d2428821e5494308d37e";
-const weather_exclude = "&exclude=[minutely,hourly]";
+var responseHeaderEl = document.getElementById("current-city");
+var searchHistoryEl = document.getElementById("search-history-div");
+const openweather_api_key = config.OWEATHER_KEY;
+const weather_exclude = "minutely,hourly"
 const unit_standard = "imperial";
+const targetJSONParams = {'current': ['temp','humidity','wind_speed','uvi'],
+                          '5D':['temp','humidity'] }
 
+
+function getDailyForecast(dailyForecastData) {
+  // weather indicator (icon)
+  // temperature
+  // humidity
+  for (var i=0; i < 5; i++){
+    
+  }
+} 
 function renderDashboard(weatherDataObj) {
   for (const [key, value] of Object.entries(weatherDataObj)) {
     console.log(`${key}: ${value}`);
   }
   var weatherIconImgEl = document.getElementById("weather-icon");
   icon = weatherDataObj['weatherIcon'];
-  icon_url = `http://openweathermap.org/img/wn/${icon}@2x.png`
+  icon_url = `http://openweathermap.org/img/wn/${icon}@4x.png`
   // imgEl = document.createElement("img");
   // imgEl.setAttribute("style","width:200px");
   // imgEl.className = "card-img";
-  // imgEl.src = `http://openweathermap.org/img/wn/${icon}@4x.png`;
+  // imgEl.src = `htctp://openweathermap.org/img/wn/${icon}@4x.png`;
   // weatherIconImgEl.append(imgEl);
-  weatherIconImgEl.innerHTML = `<img src=${icon_url} height="200" width="200" />`;
+  weatherIconImgEl.innerHTML = `<figure class=figure> <img src=${icon_url} class="figure-img" height="200" width="200" </img>`;
   
   // weatherIconImgEl.innerHTML
   // weatherDataObj.forEach( function(item) {
@@ -39,7 +52,7 @@ function searchForCity(queryString) {
     getCityForecast(`https://api.openweathermap.org/data/2.5/weather?q=${queryString}&units=imperial&appid=${openweather_api_key}`);
 }
 function getOneCall(url) {
-  fetch(url)
+  fetch(`${url}&appid=${openweather_api_key}`)
   .then(function(response) {
       if (!response.ok) {
         return null;
@@ -52,12 +65,11 @@ function getOneCall(url) {
   })
   .then(function(response) {
     if (response===null) {
-     responseEl.innerHTML = "";//`<h4>No results</h4>`;
+      responseEl.innerHTML = "No Results found!";//`<h4>No results</h4>`;
+      // return null;
     } else {
-      console.log(response);
-        // var coord = response.coord;
-        // var city_id = response.id;
-        // var city = response.name;
+        console.log(response);
+        //var name = response.name;
         var temp = response.current.temp;
         var uvi = response.current.uvi;
         var weatherType = response.current.weather[0].description;
@@ -65,15 +77,7 @@ function getOneCall(url) {
         var humidity = response.current.humidity;
         var wind_speed = response.current.wind_speed;
         var weather = response.current.weather;
-        
-        // console.log(city_id);
-        // console.log(country);
-        // console.log(coord);
-        // var name = geoData[2];
-        // var state = geoData[3];
-        // var country = geoData[4];
-
-
+        var city_id = response.id;
         var cityCurrentWeather = `<li class="list-group-item">Temperature: ${temp} F</li>
         <li class="list-group-item">Humidity: ${humidity}%</li>
         <li class="list-group-item">Wind Speed: ${wind_speed} mph</li>
@@ -89,6 +93,18 @@ function getOneCall(url) {
         'weatherType' : weatherType,
         'weatherIcon' : weatherIcon
       };
+      getDailyForecast(response.daily);
+      // searchItemButton.id = name;
+      // searchItemButton.value= city_id
+      // searchItemButton.type = "submit";
+      // searchItemButton.id = 
+      
+
+    
+    
+      // // Update the to-dos on the page
+      // createCitySearchButton(searchHistoryItem);
+    
       renderDashboard(weatherDataObj);
       // } console.log()
         // cityEl = document.createElement("h4");
@@ -104,59 +120,16 @@ function getOneCall(url) {
   });
 
 }
-function getCityForecast(url) {
-    fetch(url)
-    .then(function(response) {
-        if (!response.ok) {
-          return null;
-          // throw new Error("Not 2XX response")
-        } else {
-          return response.json();
-          // responseEl.innerHTML = `<h4>No results</h4>`
-          // return undefined;
-        }
-    })
-    .then(function(response) {
-      if (response===null) {
-       responseEl.innerHTML = "";//`<h4>No results</h4>`;
-      } else {
-        console.log(response);
-          var country = response.sys.country;
-          var coord = response.coord;
-          var city_id = response.id;
-          // var city = response.name;
-          var temp = response.main.temp;
-          var weatherType = response.weather.main;
-          var humidity = response.main.humidity;
-          var wind_speed = response.wind.speed;
-          
-          console.log(city_id);
-          console.log(country);
-          console.log(coord);
-          var cityCurrentWeather = `<ul class="list-group list-group-flush">
-          <li class="list-group-item">Temperature: ${temp} F</li>
-          <li class="list-group-item">Humidity: ${humidity}%</li>
-          <li class="list-group-item">Wind Speed: ${wind_speed} mph</li>
-          <li class="list-group-item">UV Index: ${uvi}</li>
-        </ul>`;
-        console.log(cityCurrentWeather);
-        responseEl.innerHTML = cityCurrentWeather;
-        // } console.log()
-          // cityEl = document.createElement("h4");
-          // cityEl.className = "card-title";
-          // cityEl.textContent = response.name;
-          // dateEl = document.createElement("p");
-          // dateEl.className = "card-text";
-          // dateEl.textContent=""
-          // responseEl.appendChild(cityEl);
-          // temperatureEl = document.createElement("li");
-          // responseEl.innerHTML = `<h4>${country}</h4>`;
-      }
-    });
-  }
+
   var search_history = JSON.parse(localStorage.getItem('search-history-list')) || [];
   $('#new-city-search').on('click', function(event) {
     event.preventDefault();
+
+    // console.log(event.target.id);
+    // // console.log(event.val));
+    // console.log(event.type);
+    // console.log(event.target.value);
+    // if (event.target.value === "new"){
     // Get the to-do "value" from the textbox and store it as a variable using `.val()` and `.trim()`
     var searchText = $('#city-name')
        .val()
@@ -164,27 +137,42 @@ function getCityForecast(url) {
     getGeoData(searchText); // convert city name to longitude, latitude
     console.log(searchText);
     $(`#city-name`).val('');
+    // } else {
+      // return
+    // }
     // // Clear the textbox when done using `.val()`
     // $('#to-do').val('');
   });
-
+  
+  // var createCitySearchButton = function(searchHistoryItem) {
+  //   var searchItemButton = document.createElement("button");
+  //   searchItemButton.textContent=searchHistoryItem.name;
+  //   searchItemButton.name=searchHistoryItem;
+  //   searchItemButton.value= city_id;
+  //   searchItemButton.type = "submit";
+  //   searchItemButton.classList = "list-group-item list-group-item-action";
+  //   searchHistoryEl.appendChild(searchItemButton);
+    
+  // }
   function renderSearchHistory(search_history) {
-    $('#search-history-ul').empty();
-    for (var i=0; i<search_history.length; i++){
-      console.log(search_history[i]);
-    // Creates a new variable 'toDoItem' that will hold a "<p>" tag
-    // Sets the `list` item's value as text of this <p> element
-      var searchItem = $('<li>')
-      // searchItem.text(search_history[i].name);
-      searchItem.addClass('nav-item');
-      var searchItemButton = $('<button>');
-      searchItemButton.text(search_history[i].name);
+    // $('#search-history-div').empty();
+    for (const [key, value] of Object.entries(search_history)) {
+      console.log(`${key}: ${value}`);
+      var searchItemButton = document.createElement("button");
+      
       searchItemButton.addClass("list-group-item list-group-item-action");
-      if (i===(search_history.length-1)) {
-        searchItemButton.addClass("active");
-      }
+      searchItemButton.value(search_history[i])
       
       var search_term = search_history[i].searchText;
+    }
+    // for (var i=0; i<search_history.length; i++){
+      // console.log(search_history[i]);
+    // Creates a new variable 'toDoItem' that will hold a "<p>" tag
+    // Sets the `list` item's value as text of this <p> element
+      // var searchItem = $('')
+      // searchItem.text(search_history[i].name);select
+      // searchItem.addClass('');
+      
       // var 
       // searchItemButton;
       // searchItemButton.id(search_term);
@@ -206,8 +194,7 @@ function getCityForecast(url) {
     searchItem = searchItem.append(searchItemButton);
 
     // Adds 'toDoItem' to the To-Do List div
-    $('#search-history-ul').append(searchItem);   
-    }
+    // $('#search-history-ul').append(searchItem);   
   }
   function getGeoData(searchText) {
     // searchText = document.querySelector("#search-city").value.trim();
@@ -233,39 +220,53 @@ function getCityForecast(url) {
         var country = geoResponse[0].country;
         var lon = geoResponse[0].lon;
         var lat = geoResponse[0].lat;
-    if(!state) {
-      state = 0
-    }
       // add to search history
-    var searchHistoryItem  = {
-      "name" : name,
-      "state" : state,
-      "country" : country,
-      "coords" : [ lon, lat ],
-      "searchText" : searchText
-    }
-    search_history.push(searchHistoryItem);
 
-    // // Update the to-dos on the page
+
     // renderTodos(list);
-    renderSearchHistory(search_history);
+    // appendSearchInst(searchText);
+    // renderSearchHistory(search_history);
 
     // // Save the to-dos into localStorage
     // // We need to use JSON.stringify to turn the list from an array into a string
-    localStorage.setItem('search-history', JSON.stringify(search_history));
+    if (country === "US") {
+      var fullName = `${name}, ${state}, ${country}`;
+    } else {
+      var fullName = `${name}, ${state}`;
+    }
+    var query = `lat=${lat}&lon=${lon}&${weather_exclude}&units=${unit_standard}`;
+    var searchHistoryItem = {searchText : [fullName,query]}
+    search_history.push(searchText);
+    localStorage.setItem(searchText, JSON.stringify(searchHistoryItem));
+    var searchItemButton = document.createElement("button");
+    searchItemButton.value=`lat=${lat}&lon=${lon}`;
+    searchItemButton.textContent=name;
+    searchItemButton.classList = "list-group-item list-group-item-action";
+    searchHistoryEl.appendChild(searchItemButton);
+   
     var date = moment().format('MM/DD/YY');
+   
+   
     var queryString=`${name},${state},${country}`;
     //cardTitleEl = document.createElement("h3")
-    responseEl.innerHTML = `<div class="row">
-                            <div class="col-md-8">
-                              <h3 class="card-title">${name}, ${state}, ${country}</h3>
+    
+    responseEl.innerHTML = `
+                            <div class="row">
+                            <div class="col">
+                              <h3 class="card-title">${fullName}</h3>
                               <h5 class="card-text text-muted">Current weather - ${date}</h5>
+                              <span id="weather-icon"></span>
                             </div>
-                            <div id="weather-icon" class="col-md-4"></div>
                             </div>`;
     // searchHistory
-    return getOneCall(`https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&${weather_exclude}&units=${unit_standard}&appid=${openweather_api_key}`);
+    return getOneCall(`https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&${weather_exclude}&units=${unit_standard}`);
 
     }
     });
   }
+  var formSubmitHandler = function(event) {
+    event.preventDefault();
+    console.log(event.target);
+
+  }
+  searchFormEl.addEventListener("submit",formSubmitHandler);
