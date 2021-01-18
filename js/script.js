@@ -126,13 +126,6 @@ function getOneCall(url) {
   var search_history = JSON.parse(localStorage.getItem('search-history-list')) || [];
   $('#new-city-search').on('click', function(event) {
     event.preventDefault();
-
-    // console.log(event.target.id);
-    // // console.log(event.val));
-    // console.log(event.type);
-    // console.log(event.target.value);
-    // if (event.target.value === "new"){
-    // Get the to-do "value" from the textbox and store it as a variable using `.val()` and `.trim()`
     var searchText = $('#city-name')
        .val()
        .trim();
@@ -278,7 +271,6 @@ function getOneCall(url) {
   var formSubmitHandler = function(event) {
     event.preventDefault();
     console.log(event.target);
-    // debugger;
   }
   renderSearchHistory();
   searchFormEl.addEventListener("submit",formSubmitHandler);
