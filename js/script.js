@@ -6,9 +6,10 @@ var searchFormEl = document.querySelector("#search-form");
 var responseEl = document.querySelector("#current-weather-card");
 var responseHeaderEl = document.getElementById("current-city");
 var searchHistoryEl = document.getElementById("search-history-div");
-//const openweather_api_key = config.OWEATHER_KEY;
-const openweather_api_key = OPENWEATHER_KEY;
-const weather_exclude = "minutely,hourly"
+// const openweather_api_key = config.OWEATHER_KEY;
+// const openweather_api_key = OPENWEATHER_KEY;
+const openweather_api_key='6a1f406a16d92f9d2ab71ea37b9273f5';
+const weather_exclude = "minutely,hourly";
 const unit_standard = "imperial";
 const targetJSONParams = {'current': ['temp','humidity','wind_speed','uvi'],
                           '5D':['temp','humidity'] }
@@ -207,8 +208,7 @@ function getOneCall(url) {
     if (!searchText) return
     // searchArgs = searchText.split(',');
     console.log(`Searching for ${searchText}`)
-    // responseEl.innerHTML="";
-    fetch(`https://api.openweathermap.org/geo/1.0/direct?q=${searchText}&limit=1&appid=${openweather_api_key}`)
+    fetch(`api.openweathermap.org/geo/1.0/direct?q=${searchText}&limit=1&appid=${openweather_api_key}`)
     .then(function(response) {
       return response.json();
     })
