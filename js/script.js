@@ -156,15 +156,16 @@ function getOneCall(url) {
       let key = search_history[i];
       console.log(`${key}`);
       
-      var mySearchArray = localStorage.getItem(key);
+      var mySearchArray = JSON.parse(localStorage.getItem(key));
       console.log(mySearchArray);
       var searchItemButton = document.createElement("button");
       searchItemButton.value=mySearchArray.query;
-      searchItemButton.name=mySearchArray.name;
-      searchItemButton.textContent=fullName;
+      searchItemButton.name=key;
+      searchItemButton.textContent=mySearchArray.fullName;
       searchItemButton.classList = "list-group-item list-group-item-action";
       searchHistoryEl.appendChild(searchItemButton);
     }
+    
     // for (var i=0; i<search_history.length; i++){
       // console.log(search_history[i]);
     // Creates a new variable 'toDoItem' that will hold a "<p>" tag
@@ -233,12 +234,11 @@ function getOneCall(url) {
     } else {
       var fullName = `${name}, ${country}`;
     }
-    var query = `lat=${lat}&lon=${lon}&${weather_exclude}&units=${unit_standard}`;
-    var searchHistoryItem = {"fullName": fullName,
-                            "query":query
-                          }
+    var query = `lat=${lat}&lon=${lon}&exclude=${weather_exclude}&units=${unit_standard}`;
+    var searchHistoryItem = {fullName: `${fullName}`, query : `${query}`};
 
     search_history.push(searchText);
+    localStorage.setItem('search-history-list', JSON.stringify(search_history));
     localStorage.setItem(searchText, JSON.stringify(searchHistoryItem));
     var searchItemButton = document.createElement("button");
     searchItemButton.value=query;
@@ -263,7 +263,9 @@ function getOneCall(url) {
                             </div>
                             </div>`;
     // searchHistory
-    return getOneCall(`https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&${weather_exclude}&units=${unit_standard}`);
+    renderSearchHistory();
+
+    return getOneCall(`https://api.openweathermap.org/data/2.5/onecall?${query}`);
 
     }
     });
@@ -271,6 +273,25 @@ function getOneCall(url) {
   var formSubmitHandler = function(event) {
     event.preventDefault();
     console.log(event.target);
+    // debugger;
+    console.log(searchFormEl);
+    var storedValue = localStorage.getItem(event.submitter.name);
+    var parsedValue = JSON.parse(storedValue);
+    console.log(storedValue);
+    var storedName = parsedValue.fullName;
+    var date = moment().format('MM/DD/YY');
+    responseEl.innerHTML = "";
+    responseEl.innerHTML = `
+                            <div class="row">
+                            <div class="col">
+                              <h3 class="card-title">${storedName}</h3>
+                              <h5 class="card-text text-muted">Current weather - ${date}</h5>
+                              <span id="weather-icon"></span>
+                            </div>
+                            </div>`;
+    var storedQuery = parsedValue.query;
+    getOneCall(`https://api.openweathermap.org/data/2.5/onecall?${storedQuery}`);
+    searchFormEl.reset();
   }
   renderSearchHistory();
   searchFormEl.addEventListener("submit",formSubmitHandler);
