@@ -30,10 +30,10 @@
           <!-- </div> -->
         </header>
         <div class="container">
-          <div class = "row align-items-stretch mt-0">
-          <div id="sidebarMenu" class="col-md-0 ml-0 mt-3 col-lg-4 border d-md-block">
+          <div class = "row flex-reverse align-items-content-stretch justify-content-around">
+          <div id="sidebarMenu" class="col-md-3 ml-0 col-lg-0 mt-1 pt-0 bg-dark d-md-block">
             <form id="search-form">
-              <div id="new-search-form" class="form-group d-flex d-md-block my-2 pt-4 my-lg-0">
+              <div id="new-search-form" class="form-group d-flex pt-2">
                 <label class="form-label my-2 sr-only" for="city-name" >City Name</label>
                 <input class="form-input my-2 my-sm-0" id="city-name" type="text">
                 <button class="btn btn-secondary my-2 my-sm-0" id="new-city-search" name="submit" type="Submit">Search</button>
@@ -43,21 +43,19 @@
                   <!-- <span></span> -->
                 <!-- </h6> -->
                 <!-- <div id="search-history-div" class="nav flex-column bg-dark"> -->
-                  <div class="form-group d-block list-group mb-2" id="search-history-div"></div>
-              </form>
+                
+                  <div class="d-block bg-dark list-group mb-2" id="search-history-div">
+                    
+                  </div>
+                </form>
               <!-- </div> -->
             <!-- </nav> -->
-          </div>
-            <main role="main" class="d-flex col-md-8 col-lg-6 d-md-block bg-light">
-            <!-- <div class="row mt-2"> -->
-            <!-- <div class="col"> -->
-            <div class="card my-2">
-              <div id="current-weather-card" class="card-body">
-                <h3 class="card-title text-center">Please select a City</h3>
-              </div>
-              <ul id="current-weather-list" class="list-group list-group-flush"></ul>
-            <!-- </div> -->
-            <!-- </div> -->
+            </div>
+            <div class="col-0 bg-dark mx-auto"></div>
+            <main id="main-dashboard-top" role="main" class="col-md-8 col-sm-0 d-md-block bg-light">
+              
+              <div id="current-display-top" class="row mb-3 d-flex">
+                <div class= "h3 text-bold">Select a city to begin</div>
             </div>
             </main>
 
