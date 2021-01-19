@@ -29,10 +29,10 @@
           <!-- </div> -->
         </header>
         <div class="container">
-          <div class = "row justify-content-around mt-0">
+          <div class = "row align-items-stretch mt-0">
           <div id="sidebarMenu" class="col-md-0 ml-0 mt-3 col-lg-4 border d-md-block">
             <form id="search-form">
-              <div id="new-search-form" class="form-group d-inline-flex d-md-block my-2 pt-4 my-lg-0">
+              <div id="new-search-form" class="form-group d-flex d-md-block my-2 pt-4 my-lg-0">
                 <label class="form-label my-2 sr-only" for="city-name" >City Name</label>
                 <input class="form-input my-2 my-sm-0" id="city-name" type="text">
                 <button class="btn btn-secondary my-2 my-sm-0" id="new-city-search" name="submit" type="Submit">Search</button>
@@ -42,30 +42,21 @@
                   <!-- <span></span> -->
                 <!-- </h6> -->
                 <!-- <div id="search-history-div" class="nav flex-column bg-dark"> -->
-                  <div class="form-group d-block" id="search-history-div" class="list-group mb-2"></div>
-                
+                  <div class="form-group d-block list-group mb-2" id="search-history-div"></div>
               </form>
               <!-- </div> -->
             <!-- </nav> -->
           </div>
-            <main role="main" class="col-md-8 col-lg-7 d-md-block bg-light">
-
-              <!-- <div class="card mb-3 align-right">
-                <img src="..." class="card-img-top" alt="...">
-                <div class="card-body">
-                  <h5 class="card-title">Card title</h5>
-                  <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-                  <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
-                </div>
-              </div> -->
-            
-            <div class="card my-3">
-              <!-- <img src="..." class="card-img-top" alt="..."> -->
-              <!-- <link rel="icon" rel="http://openweathermap.org/img/wn/10d@4x.png" type="image/gif" sizes="200x200"/> -->
+            <main role="main" class="d-flex col-md-8 col-lg-6 d-md-block bg-light">
+            <!-- <div class="row mt-2"> -->
+            <!-- <div class="col"> -->
+            <div class="card my-2">
               <div id="current-weather-card" class="card-body">
-                <h3 class="card-title">Please select a City</h3>
+                <h3 class="card-title text-center">Please select a City</h3>
               </div>
               <ul id="current-weather-list" class="list-group list-group-flush"></ul>
+            <!-- </div> -->
+            <!-- </div> -->
             </div>
             </main>
 

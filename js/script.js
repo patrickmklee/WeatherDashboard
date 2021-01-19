@@ -12,17 +12,29 @@ const openweather_api_key='6a1f406a16d92f9d2ab71ea37b9273f5';
 const weather_exclude = "minutely,hourly";
 const unit_standard = "imperial";
 const targetJSONParams = {'current': ['temp','humidity','wind_speed','uvi'],
-                          '5D':['temp','humidity'] }
+                          'daily':['icon', 'temp','humidity'] }
+const UV_INDEX_LIMIT_LOW = 2;
+const UV_INDEX_LIMIT_MID = 5;
+const UV_INDEX_LIMIT_HIGH = 6;
+const UV_INDEX_LIMIT_SEVERE = 8;
 
 
-function getDailyForecast(dailyForecastData) {
-  // weather indicator (icon)
-  // temperature
-  // humidity
+function genDayElement(singleForecastItem) {
+  console.log(singleForecastItem);
+}
+function createForecast(dailyForecastData) {
+  startDate = moment().format("dddd MMM Do YY");
   for (var i=0; i < 5; i++){
-
+      genDayElement(dailyForecastData[i]);
   }
 } 
+var createWeatherObj = function(weatherResponseData) {
+  for (const key of targetJSONParams['daily']) {
+    const value = weatherResponseData.key;
+
+  }
+  
+};
 function renderDashboard(weatherDataObj) {
   for (const [key, value] of Object.entries(weatherDataObj)) {
     console.log(`${key}: ${value}`);
@@ -73,20 +85,30 @@ function getOneCall(url) {
         console.log(response);
         //var name = response.name;
         var temp = response.current.temp;
-        var uvi = response.current.uvi;
+        var uvi = parseFloat(response.current.uvi);
+        
         var weatherType = response.current.weather[0].description;
         var weatherIcon = response.current.weather[0].icon;
         var humidity = response.current.humidity;
         var wind_speed = response.current.wind_speed;
         var weather = response.current.weather;
         var city_id = response.id;
-        var cityCurrentWeather = `<li class="list-group-item">Temperature: ${temp} F</li>
-        <li class="list-group-item">Humidity: ${humidity}%</li>
-        <li class="list-group-item">Wind Speed: ${wind_speed} mph</li>
-        <li class="list-group-item">UV Index: ${uvi}</li>`
+        if (uvi < UV_INDEX_LIMIT_LOW) {
+          var uv_indicator_color = "bg-success";
+        } else if (uvi < UV_INDEX_LIMIT_MID ) {
+          var uv_indicator_color = "bg-warning";
+        } else if (uvi < UV_INDEX_LIMIT_HIGH) {
+          var uv_indicator_color = "bg-danger";
+        }
+
+        var cityCurrentWeather = `<div class="p-2 mb-2">Temperature: ${temp} F</div>
+        <div class="p-2 mb-2">Humidity: ${humidity}%</div>
+        <div class="p-2 mb-2">Wind Speed: ${wind_speed} </div>
+        <div class="p-2 mb-2">UV Index: <span id="uvi-color" class="text-light ${uv_indicator_color}">${uvi}</span></div>`
       console.log(cityCurrentWeather);
       var weatherDataUl = document.getElementById("current-weather-list");
       weatherDataUl.innerHTML = cityCurrentWeather; 
+
       var weatherDataObj = {
         'temp' : temp,
         'humidity' : humidity,
@@ -95,7 +117,8 @@ function getOneCall(url) {
         'weatherType' : weatherType,
         'weatherIcon' : weatherIcon
       };
-      getDailyForecast(response.daily);
+      console.log(response.daily);
+      createForecast(response.daily);
       // searchItemButton.id = name;
       // searchItemButton.value= city_id
       // searchItemButton.type = "submit";
@@ -124,6 +147,14 @@ function getOneCall(url) {
 }
 
   var search_history = JSON.parse(localStorage.getItem('search-history-list')) || [];
+  $('#search-history-div').on('click', function(event) {
+    if (!(event.target.matches('.btn-history')) ) return;
+    //val buttonName = $('#')
+    console.log(event.target);
+    var histVal = $('#search-history-div').val().trim();
+    console.log(histVal);
+  });
+  
   $('#new-city-search').on('click', function(event) {
     event.preventDefault();
     var searchText = $('#city-name')
@@ -138,6 +169,7 @@ function getOneCall(url) {
     // // Clear the textbox when done using `.val()`
     // $('#to-do').val('');
   });
+  
   
   // var createCitySearchButton = function(searchHistoryItem) {
   //   var searchItemButton = document.createElement("button");
@@ -162,7 +194,7 @@ function getOneCall(url) {
       searchItemButton.value=mySearchArray.query;
       searchItemButton.name=key;
       searchItemButton.textContent=mySearchArray.fullName;
-      searchItemButton.classList = "list-group-item list-group-item-action";
+      searchItemButton.classList = "list-group-item list-group-item-action btn-history";
       searchHistoryEl.appendChild(searchItemButton);
     }
     
@@ -245,7 +277,7 @@ function getOneCall(url) {
     searchItemButton.name=name;
     // searchItemButton.id=``
     searchItemButton.textContent=name;
-    searchItemButton.classList = "list-group-item list-group-item-action";
+    searchItemButton.classList = "list-group-item list-group-item-action btn-history";
     searchHistoryEl.appendChild(searchItemButton);
    
     var date = moment().format('MM/DD/YY');
@@ -254,12 +286,11 @@ function getOneCall(url) {
     var queryString=`${name},${state},${country}`;
     //cardTitleEl = document.createElement("h3")
     
-    responseEl.innerHTML = `
-                            <div class="row">
+    responseEl.innerHTML = `<div class="row">
                             <div class="col">
-                              <h3 class="card-title">${fullName}</h3>
-                              <h5 class="card-text text-muted">Current weather - ${date}</h5>
-                              <span id="weather-icon"></span>
+                            <div class="card-title"><p class="display-4">${fullName}</p></div>
+                            <h5 class="card-text text-muted">Current weather - ${date}</h5>
+                            <span id="weather-icon"></span>
                             </div>
                             </div>`;
     // searchHistory
@@ -282,10 +313,11 @@ function getOneCall(url) {
     var date = moment().format('MM/DD/YY');
     responseEl.innerHTML = "";
     responseEl.innerHTML = `
-                            <div class="row">
+                            <div class="row d-block">
                             <div class="col">
-                              <h3 class="card-title">${storedName}</h3>
-                              <h5 class="card-text text-muted">Current weather - ${date}</h5>
+                              <div class="card-title"><p class="display-4">${storedName}</p></div>
+                              <p class="card-text h6 text-muted">Current weather - ${date}</p>
+                              
                               <span id="weather-icon"></span>
                             </div>
                             </div>`;
