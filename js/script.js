@@ -281,7 +281,7 @@ var search_history = JSON.parse(localStorage.getItem('search-history-list')) || 
     // $('#search-history-ul').append(searchItem);   
   }
   function getGeoData(searchText) {
-  fetch(`http://api.openweathermap.org/geo/1.0/direct?q=${searchText}&limit=1&appid=${openweather_api_key}`)
+  fetch(`https://api.openweathermap.org/geo/1.0/direct?q=${searchText}&limit=1&appid=${openweather_api_key}`)
   .then(function(response) {
   return response.json();
   })
