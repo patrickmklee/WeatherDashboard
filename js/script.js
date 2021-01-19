@@ -1,15 +1,8 @@
 
-//`https://api.openweathermap.org/data/2.5/onecall?lat={lat}&lon={lon}&exclude={part}&appid={API key}`
-//`api.openweathermap.org/data/2.5/forecast?q={city name},{state code},{country code}&appid={API key}`
-//`http://api.openweathermap.org/geo/1.0/direct?q={city name},{state code},{country code}&limit={limit}&appid={API key}`
-var searchFormEl = document.querySelector("#search-form");
-var responseEl = document.querySelector("#current-weather-card");
-var responseHeaderEl = document.getElementById("current-city");
-var searchHistoryEl = document.getElementById("search-history-div");
-// const openweather_api_key = config.OWEATHER_KEY;
-// const openweather_api_key = OPENWEATHER_KEY;
-const openweather_api_key='6a1f406a16d92f9d2ab71ea37b9273f5';
-const weather_exclude = "minutely,hourly";
+const main = document.body.main;
+
+const openweather_api_key = config.OWEATHER_KEY;
+const weather_exclude = "minutely,hourly"
 const unit_standard = "imperial";
 const targetJSONParams = {'current': ['temp','humidity','wind_speed','uvi'],
                           'daily':['icon', 'temp','humidity'] }
@@ -18,15 +11,62 @@ const UV_INDEX_LIMIT_MID = 5;
 const UV_INDEX_LIMIT_HIGH = 6;
 const UV_INDEX_LIMIT_SEVERE = 8;
 
+var searchFormEl = document.querySelector("#search-form");
+var responseEl = document.querySelector("#current-display-top");
+var responseHeaderEl = document.querySelector("#current-city");
+var searchHistoryEl = document.querySelector("#search-history-div");
 
-function genDayElement(singleForecastItem) {
-  console.log(singleForecastItem);
+var genDayElement = function(singleForecastItem, formatDate){
+  // var date = moment(singleForecastItem.dt);
+  // var formatDate = date.format('ddddd MMM Do YY');
+  var temp = singleForecastItem.temp.day;
+  var humidity = singleForecastItem.humidity;
+  var icon = singleForecastItem.weather[0].icon;
+  var cardBodyEl = document.createElement("div")
+  let icon_html = getIconHtml(icon,50);
+  cardBodyEl.className = "card-body";
+  cardBodyEl.innerHTML = `<span><h6 class="card-title">${formatDate}</h6>
+    ${icon_html}</span>
+    <p class="card-text">${temp} <span>&#8457</span></p>
+    <p class="card-text">${humidity} %</p>
+    </ul>`;
+  return cardBodyEl;
 }
 function createForecast(dailyForecastData) {
-  startDate = moment().format("dddd MMM Do YY");
-  for (var i=0; i < 5; i++){
-      genDayElement(dailyForecastData[i]);
+  var startDate = moment().format("ddd MMM Do YY");
+  // var dt_0= moment(dailyForecastData[0].dt);
+  // var dt_s = moment().format("dddd MMM Do YY");
+  // var top5DayEl = document.createElement('div');
+  // var mainEl = document.getElementById('main-dashboard-top');
+  var forecastRowEl = document.createElement("div");
+  forecastRowEl.className = "row d-flex justify-content-around'";
+  
+
+  // for (let i=0; i < 5; i++){
+  //     var colEl = document.createElement("div");
+  //     colEl.className="col";
+  //     colEl.id = `col-forecast-${i}`
+  //     forecastRowEl.appendChild(colEl);
+  // }
+  for (var j=0; j<5;j++) {
+  // forecastRowEl.childNodes.forEach
+  var colEl = document.createElement("div");
+    colEl.className="col-sm-6 col-md-1 col-lg-2 my-2 my-sm-0 d-inline-flex";
+    colEl.id = `col-forecast-${j}`
+      const itemData = dailyForecastData[j];
+      // let icon = dailyForecastData[j].icon;
+      // let temp = dailyForecastData[j].temp.day;
+      // let humidity = dailyForecastData[j].humidity;
+      let thisDate = moment().add(j,'days').format('ddd Do MMM')
+      var dayCardEl = document.createElement("div");
+      dayCardEl.className = "card text-light bg-primary my-2 my-sm-0";
+      dayCardEl.appendChild(genDayElement(itemData,thisDate));
+      colEl.appendChild(dayCardEl);
+      forecastRowEl.appendChild(colEl);
   }
+  // responseEl.appendChild(forecastRowEl);
+  responseEl.appendChild(forecastRowEl);
+  // return forecastRowEl;
 } 
 var createWeatherObj = function(weatherResponseData) {
   for (const key of targetJSONParams['daily']) {
@@ -35,6 +75,10 @@ var createWeatherObj = function(weatherResponseData) {
   }
   
 };
+function getIconHtml(icon,size){
+  var icon_url = `http://openweathermap.org/img/wn/${icon}@4x.png`
+  return (`<figure class="figure" height=${size} width=${size}> <img src=${icon_url} class="figure-img" height="${size}" width="${size}" </img>`);
+}
 function renderDashboard(weatherDataObj) {
   for (const [key, value] of Object.entries(weatherDataObj)) {
     console.log(`${key}: ${value}`);
@@ -69,20 +113,17 @@ function getOneCall(url) {
   fetch(`${url}&appid=${openweather_api_key}`)
   .then(function(response) {
       if (!response.ok) {
-        return null;
-        // throw new Error("Not 2XX response")
+        response = null;
       } else {
         return response.json();
-        // responseEl.innerHTML = `<h4>No results</h4>`
-        // return undefined;
       }
   })
   .then(function(response) {
     if (response===null) {
       responseEl.innerHTML = "No Results found!";//`<h4>No results</h4>`;
-      // return null;
+      return null;
     } else {
-        console.log(response);
+        // console.log(response);
         //var name = response.name;
         var temp = response.current.temp;
         var uvi = parseFloat(response.current.uvi);
@@ -100,15 +141,20 @@ function getOneCall(url) {
         } else if (uvi < UV_INDEX_LIMIT_HIGH) {
           var uv_indicator_color = "bg-danger";
         }
+        
+        let weatherDataUl = document.createElement("ul");;
+        weatherDataUl.id = "current-weather-list";
+        weatherDataUl.className= "list-group list-group-flush";
+        weatherDataUl.innerHTML = `<li class="list-group-item">Temperature: ${temp} F</li>
+        <li class="list-group-item">Humidity: ${humidity}%</li>
+        <li class="list-group-item">Wind Speed: ${wind_speed} </li>
+        <li class="list-group-item">UV Index: <span id="uvi-color" class="text-light ${uv_indicator_color}">${uvi}</span></li>`;
 
-        var cityCurrentWeather = `<div class="p-2 mb-2">Temperature: ${temp} F</div>
-        <div class="p-2 mb-2">Humidity: ${humidity}%</div>
-        <div class="p-2 mb-2">Wind Speed: ${wind_speed} </div>
-        <div class="p-2 mb-2">UV Index: <span id="uvi-color" class="text-light ${uv_indicator_color}">${uvi}</span></div>`
-      console.log(cityCurrentWeather);
-      var weatherDataUl = document.getElementById("current-weather-list");
-      weatherDataUl.innerHTML = cityCurrentWeather; 
-
+      // console.log(cityCurrentWeather);
+      // var weatherDataUl = document.getElementById("current-weather-list");
+      // weatherDataUl.innerHTML = cityCurrentWeather; 
+      var cardTopEl= document.getElementById('weather-top-card')
+      cardTopEl.appendChild(weatherDataUl);
       var weatherDataObj = {
         'temp' : temp,
         'humidity' : humidity,
@@ -117,8 +163,10 @@ function getOneCall(url) {
         'weatherType' : weatherType,
         'weatherIcon' : weatherIcon
       };
-      console.log(response.daily);
+      // console.log(response);
+      // console.log(response.daily);
       createForecast(response.daily);
+      // responseEl.appendChild(forecastRowEl);
       // searchItemButton.id = name;
       // searchItemButton.value= city_id
       // searchItemButton.type = "submit";
@@ -130,14 +178,13 @@ function getOneCall(url) {
       // // Update the to-dos on the page
       // createCitySearchButton(searchHistoryItem);
     
-      renderDashboard(weatherDataObj);
+      return renderDashboard(weatherDataObj);
       // } console.log()
         // cityEl = document.createElement("h4");
         // cityEl.className = "card-title";
         // cityEl.textContent = response.name;
         // dateEl = document.createElement("p");
         // dateEl.className = "card-text";
-        // dateEl.textContent=""
         // responseEl.appendChild(cityEl);
         // temperatureEl = document.createElement("li");
         // responseEl.innerHTML = `<h4>${country}</h4>`;
@@ -145,29 +192,33 @@ function getOneCall(url) {
   });
 
 }
-
-  var search_history = JSON.parse(localStorage.getItem('search-history-list')) || [];
+// $()
+var search_history = JSON.parse(localStorage.getItem('search-history-list')) || [];
   $('#search-history-div').on('click', function(event) {
     if (!(event.target.matches('.btn-history')) ) return;
-    //val buttonName = $('#')
-    console.log(event.target);
-    var histVal = $('#search-history-div').val().trim();
-    console.log(histVal);
+    event.preventDefault();
+    $('#current-display-top').empty();
+    
   });
+    //val buttonName = $('#')
+   
+  //   console.log(event.target);
+  //   var histVal = $('#search-history-div')
+  //   .val()
+  //   .trim();
+  //   getOneCall()
+  //   console.log(histVal);
+  // });
   
   $('#new-city-search').on('click', function(event) {
     event.preventDefault();
+    $('#current-display-top').empty();
     var searchText = $('#city-name')
        .val()
        .trim();
+    // console.log(searchText);
     getGeoData(searchText); // convert city name to longitude, latitude
-    console.log(searchText);
     $(`#city-name`).val('');
-    // } else {
-      // return
-    // }
-    // // Clear the textbox when done using `.val()`
-    // $('#to-do').val('');
   });
   
   
@@ -182,7 +233,7 @@ function getOneCall(url) {
     
   // }
   function renderSearchHistory() {
-    $('#search-history-div').empty();
+    // $('#search-history-div').empty();
     for (var i=0; i < search_history.length; i++) {
     // for (const [key, value] of Object.entries(search_history)) {
       let key = search_history[i];
@@ -230,71 +281,63 @@ function getOneCall(url) {
     // $('#search-history-ul').append(searchItem);   
   }
   function getGeoData(searchText) {
-    // searchText = document.querySelector("#search-city").value.trim();
-    if (!searchText) return
-    // searchArgs = searchText.split(',');
-    console.log(`Searching for ${searchText}`)
-    fetch(`https://api.openweathermap.org/geo/1.0/direct?q=${searchText}&limit=1&appid=${openweather_api_key}`)
-    .then(function(response) {
-      return response.json();
-    })
-    .then(function(geoResponse) {
-      if(geoResponse.length === 0) {
-        console.log("No response from geo api");
-        return null;
-        // responseEl.innerHTML = `<h4>No results</h4>`;
-      } else {
-        // responseEl.innerHTML="";
-      
-      // console.log(geoResponse);
+  fetch(`http://api.openweathermap.org/geo/1.0/direct?q=${searchText}&limit=1&appid=${openweather_api_key}`)
+  .then(function(response) {
+  return response.json();
+  })
+  .then(function(geoResponse) {
+    if(geoResponse.length === 0) {
+      console.log("No response from geo api");
+      return null;
+    } else {
         var name = geoResponse[0].name;
         var state = geoResponse[0].state;
         var country = geoResponse[0].country;
         var lon = geoResponse[0].lon;
         var lat = geoResponse[0].lat;
-      // add to search history
-
-
-    // renderTodos(list);
-    // appendSearchInst(searchText);
-    
-
-    // // Save the to-dos into localStorage
-    // // We need to use JSON.stringify to turn the list from an array into a string
     if (country === "US") {
       var fullName = `${name}, ${state}`;
     } else {
       var fullName = `${name}, ${country}`;
     }
     var query = `lat=${lat}&lon=${lon}&exclude=${weather_exclude}&units=${unit_standard}`;
-    var searchHistoryItem = {fullName: `${fullName}`, query : `${query}`};
 
-    search_history.push(searchText);
-    localStorage.setItem('search-history-list', JSON.stringify(search_history));
-    localStorage.setItem(searchText, JSON.stringify(searchHistoryItem));
-    var searchItemButton = document.createElement("button");
-    searchItemButton.value=query;
-    searchItemButton.name=name;
-    // searchItemButton.id=``
-    searchItemButton.textContent=name;
-    searchItemButton.classList = "list-group-item list-group-item-action btn-history";
-    searchHistoryEl.appendChild(searchItemButton);
-   
+    var searchHistoryItem = {fullName: `${fullName}`, query : `${query}`};
+  
+    if (localStorage.getItem(searchText.toLowerCase())){
+      console.log('already saved');
+    } else {
+      search_history.push(searchText.toLowerCase());
+      localStorage.setItem('search-history-list', JSON.stringify(search_history));
+      localStorage.setItem(searchText.toLowerCase(), JSON.stringify(searchHistoryItem));
+      var searchItemButton = document.createElement("button");
+      searchItemButton.value=query;
+      searchItemButton.name=name;
+      searchItemButton.textContent=name;
+      searchItemButton.classList = "list-group-item list-group-item-action btn-history";
+      searchHistoryEl.appendChild(searchItemButton);
+    }
     var date = moment().format('MM/DD/YY');
    
    
     var queryString=`${name},${state},${country}`;
     //cardTitleEl = document.createElement("h3")
-    
-    responseEl.innerHTML = `<div class="row">
-                            <div class="col">
-                            <div class="card-title"><p class="display-4">${fullName}</p></div>
-                            <h5 class="card-text text-muted">Current weather - ${date}</h5>
-                            <span id="weather-icon"></span>
-                            </div>
-                            </div>`;
+    var currentWeatherColEl = document.createElement("div");
+    let currentWeatherCardEl = document.createElement("div");
+
+    currentWeatherColEl.className = "col";
+    currentWeatherColEl.id = "weather-top-col"
+    console.log("geodata")
+    currentWeatherCardEl.innerHTML = `<div class="card-title"><p class="display-4">${fullName}</p></div>
+    <span id="weather-icon"><h5 class="card-text text-muted">Current weather - ${date}</span></h5>`;
+    currentWeatherColEl.className = "col";
+    currentWeatherColEl.id = "weather-top-col"
+    currentWeatherCardEl.className = "card my-2";
+    currentWeatherCardEl.id = "weather-top-card"
     // searchHistory
-    renderSearchHistory();
+    // responseEl.appendChild(currentWeatherColEl)
+    currentWeatherColEl.appendChild(currentWeatherCardEl)
+    responseEl.appendChild(currentWeatherColEl);
 
     return getOneCall(`https://api.openweathermap.org/data/2.5/onecall?${query}`);
 
@@ -302,28 +345,53 @@ function getOneCall(url) {
     });
   }
   var formSubmitHandler = function(event) {
-    event.preventDefault();
-    console.log(event.target);
-    // debugger;
-    console.log(searchFormEl);
+    event.preventDefault();  
+    if (event.target.matches('#new-search-city')) return;
+
     var storedValue = localStorage.getItem(event.submitter.name);
     var parsedValue = JSON.parse(storedValue);
     console.log(storedValue);
     var storedName = parsedValue.fullName;
     var date = moment().format('MM/DD/YY');
-    responseEl.innerHTML = "";
-    responseEl.innerHTML = `
-                            <div class="row d-block">
-                            <div class="col">
-                              <div class="card-title"><p class="display-4">${storedName}</p></div>
-                              <p class="card-text h6 text-muted">Current weather - ${date}</p>
-                              
-                              <span id="weather-icon"></span>
-                            </div>
-                            </div>`;
+    var currentWeatherColEl = document.createElement("div");
+    let currentWeatherCardEl = document.createElement("div");
     var storedQuery = parsedValue.query;
+    currentWeatherColEl.className = "col";
+    currentWeatherColEl.id = "weather-top-col"
+    currentWeatherCardEl.className = "card my-2";
+    currentWeatherCardEl.id = "weather-top-card"
+    currentWeatherCardEl.innerHTML = `<div class="card-title"><p class="display-4">${storedName}</p></div>
+    <span id="weather-icon"><h5 class="card-text text-muted">Current weather - ${date}</h5></span>`;
+
+    currentWeatherColEl.appendChild(currentWeatherCardEl)
+    responseEl.appendChild(currentWeatherColEl);
     getOneCall(`https://api.openweathermap.org/data/2.5/onecall?${storedQuery}`);
     searchFormEl.reset();
-  }
+  };
   renderSearchHistory();
   searchFormEl.addEventListener("submit",formSubmitHandler);
+  searchHistoryEl.addEventListener('click', function(event){
+    event.preventDefault();
+    
+    var storedValue = localStorage.getItem(event.target.name.toLowerCase());
+    var parsedValue = JSON.parse(storedValue);
+    console.log(storedValue);
+    var storedName = parsedValue.fullName;
+    var date = moment().format('MM/DD/YY');
+    var currentWeatherColEl = document.createElement("div");
+    let currentWeatherCardEl = document.createElement("div");
+
+    var storedQuery = parsedValue.query;
+    currentWeatherColEl.className = "col";
+    currentWeatherColEl.id = "weather-top-col"
+    currentWeatherCardEl.className = "card my-2";
+    currentWeatherCardEl.id = "weather-top-card"
+    
+    console.log("geodata")
+    currentWeatherCardEl.innerHTML = `<div class="card-title"><p class="display-4">${storedName}</p></div>
+    <span id="weather-icon"><h5 class="card-text text-muted">Current weather - ${date}</h5></span>`;
+    currentWeatherColEl.appendChild(currentWeatherCardEl)
+    responseEl.appendChild(currentWeatherColEl);
+        return getOneCall(`https://api.openweathermap.org/data/2.5/onecall?${storedQuery}`);
+  });
+  
