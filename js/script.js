@@ -105,10 +105,45 @@ function renderDashboard(weatherDataObj) {
 // function createHistEntry()
 
 // const city_list = JSON.parse(json_file);
+function getWeatherFromGeo(geo) {
+    console.log(`Searching for ${geo}`)
+    fetch(`https://api.openweathermap.org/data/2.5/weather?${geo}&appid=${openweather_api_key}`)
+    .then(function(response) {
+      if (!response.ok) {
+        response = null;
+      } else {
+        return response.json();
+      }
+    })
+    .then(function(response) {
+      if (response===null) {
+        responseEl.innerHTML = "No Results found!"; 
+        return null;
+      } else { 
+        console.log(response)
+        var weatherDataObj = response.main
+        let weatherDataUl = document.createElement("ul");
+        weatherDataUl.id = "current-weather-list";
+        weatherDataUl.className= "list-group list-group-flush";
+        weatherDataUl.innerHTML = `<li class="list-group-item">Temperature: ${weatherDataObj.temp} F</li>
+        <li class="list-group-item">Humidity: ${weatherDataObj.humidity}%</li>
+        <li class="list-group-item">Wind Speed: ${weatherDataObj.wind_speed} </li>`
+        //<li class="list-group-item">UV Index: <span id="uvi-color" class="text-light ${weatherDataObj.uv_indicator_color}">${uvi}</span></li>`;
+        var cardTopEl= document.getElementById('weather-top-card')
+        cardTopEl.appendChild(weatherDataUl);
+        
+        console.log(response.daily);
+        createForecast(response.daily);
+      }
+      });
+    }
 function searchForCity(queryString) {
     console.log(`Searching for ${queryString}`)
     getCityForecast(`https://api.openweathermap.org/data/2.5/weather?q=${queryString}&units=imperial&appid=${openweather_api_key}`);
+    //getCityForecast(`https://api.openweathermap.org/data/3.0/weather?q=${queryString}&units=imperial&appid=${openweather_api_key}`);
 }
+
+
 function getOneCall(url) {
   fetch(`${url}&appid=${openweather_api_key}`)
   .then(function(response) {
@@ -118,13 +153,16 @@ function getOneCall(url) {
         return response.json();
       }
   })
-  .then(function(response) {
-    if (response===null) {
-      responseEl.innerHTML = "No Results found!";//`<h4>No results</h4>`;
+  .then( 
+    function(response) 
+    {if (response===null) {
+      responseEl.innerHTML = "No Results found!"; 
       return null;
     } else {
-        // console.log(response);
+        console.log(this.response);
+        response=this.response
         //var name = response.name;
+        // -- Parse weather JSON
         var temp = response.current.temp;
         var uvi = parseFloat(response.current.uvi);
         
@@ -140,8 +178,7 @@ function getOneCall(url) {
           var uv_indicator_color = "bg-warning";
         } else if (uvi < UV_INDEX_LIMIT_HIGH) {
           var uv_indicator_color = "bg-danger";
-        }
-        
+        } 
         let weatherDataUl = document.createElement("ul");;
         weatherDataUl.id = "current-weather-list";
         weatherDataUl.className= "list-group list-group-flush";
@@ -210,12 +247,13 @@ var search_history = JSON.parse(localStorage.getItem('search-history-list')) || 
   //   console.log(histVal);
   // });
   
-  $('#new-city-search').on('click', function(event) {
-    event.preventDefault();
-    $('#current-display-top').empty();
-    var searchText = $('#city-name')
-       .val()
-       .trim();
+  $('#new-city-search').on('click', 
+    function(event) {
+      event.preventDefault();
+      $('#current-display-top').empty();
+      var searchText = $('#city-name')
+      .val()
+      .trim();
     // console.log(searchText);
     getGeoData(searchText); // convert city name to longitude, latitude
     $(`#city-name`).val('');
@@ -338,8 +376,8 @@ var search_history = JSON.parse(localStorage.getItem('search-history-list')) || 
     // responseEl.appendChild(currentWeatherColEl)
     currentWeatherColEl.appendChild(currentWeatherCardEl)
     responseEl.appendChild(currentWeatherColEl);
-
-    return getOneCall(`https://api.openweathermap.org/data/2.5/onecall?${query}`);
+    return getWeatherFromGeo(query)
+    // return getOneCall(`https://api.openweathermap.org/data/2.5/onecall?${query}`);
 
     }
     });
@@ -370,28 +408,27 @@ var search_history = JSON.parse(localStorage.getItem('search-history-list')) || 
   };
   renderSearchHistory();
   searchFormEl.addEventListener("submit",formSubmitHandler);
-  searchHistoryEl.addEventListener('click', function(event){
-    event.preventDefault();
-    
-    var storedValue = localStorage.getItem(event.target.name.toLowerCase());
-    var parsedValue = JSON.parse(storedValue);
-    console.log(storedValue);
-    var storedName = parsedValue.fullName;
-    var date = moment().format('MM/DD/YY');
-    var currentWeatherColEl = document.createElement("div");
-    let currentWeatherCardEl = document.createElement("div");
+  searchHistoryEl.addEventListener('click', 
+    function(event) {event.preventDefault();    
+      var storedValue = localStorage.getItem(event.target.name.toLowerCase());
+      var parsedValue = JSON.parse(storedValue);
+      console.log(storedValue);
+      var storedName = parsedValue.fullName;
+      var date = moment().format('MM/DD/YY');
+      var currentWeatherColEl = document.createElement("div");
+      let currentWeatherCardEl = document.createElement("div");
 
-    var storedQuery = parsedValue.query;
-    currentWeatherColEl.className = "col";
-    currentWeatherColEl.id = "weather-top-col"
-    currentWeatherCardEl.className = "card my-2";
-    currentWeatherCardEl.id = "weather-top-card"
-    
-    console.log("geodata")
-    currentWeatherCardEl.innerHTML = `<div class="card-title"><p class="display-4">${storedName}</p></div>
-    <span id="weather-icon"><h5 class="card-text text-muted">Current weather - ${date}</h5></span>`;
-    currentWeatherColEl.appendChild(currentWeatherCardEl)
-    responseEl.appendChild(currentWeatherColEl);
-        return getOneCall(`https://api.openweathermap.org/data/2.5/onecall?${storedQuery}`);
+      var storedQuery = parsedValue.query;
+      currentWeatherColEl.className = "col";
+      currentWeatherColEl.id = "weather-top-col"
+      currentWeatherCardEl.className = "card my-2";
+      currentWeatherCardEl.id = "weather-top-card"
+      
+      // console.log("geodata")
+      currentWeatherCardEl.innerHTML = `<div class="card-title"><p class="display-4">${storedName}</p></div>
+      <span id="weather-icon"><h5 class="card-text text-muted">Current weather - ${date}</h5></span>`;
+      currentWeatherColEl.appendChild(currentWeatherCardEl)
+      responseEl.appendChild(currentWeatherColEl);
+      return getWeatherFromGeo(`${storedQuery}`);
   });
   
